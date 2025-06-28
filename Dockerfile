@@ -14,10 +14,12 @@ COPY backend/package*.json ./backend/
 
 # Install Node.js dependencies
 # Install root dependencies (if any)
-RUN npm install --only=production
+RUN npm install --omit=dev
 
 # Install backend dependencies
-RUN cd backend && npm install --only=production
+WORKDIR /app/backend
+RUN npm install --omit=dev
+WORKDIR /app
 
 # Copy application source code
 # This is done after npm install for better caching
@@ -38,5 +40,6 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Start the backend server
-CMD ["sh", "-c", "cd backend && npm start"]
+# Set working directory to backend and start the server
+WORKDIR /app/backend
+CMD ["npm", "start"]
