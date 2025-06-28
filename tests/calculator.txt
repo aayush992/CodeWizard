@@ -1,0 +1,54 @@
+// 🧮 Advanced Calculator
+// Demonstrates complex arithmetic operations and expressions
+
+int main() {
+    print "=== CodeWizard Calculator ===";
+    
+    // Basic operations
+    int a = 15;
+    int b = 4;
+    
+    print "Numbers: a = 15, b = 4";
+    print "";
+    
+    // Addition
+    int sum = a + b;
+    print "Addition: 15 + 4 = ";
+    print sum;
+    
+    // Subtraction
+    int diff = a - b;
+    print "Subtraction: 15 - 4 = ";
+    print diff;
+    
+    // Multiplication
+    int product = a * b;
+    print "Multiplication: 15 * 4 = ";
+    print product;
+    
+    // Division
+    int quotient = a / b;
+    print "Division: 15 / 4 = ";
+    print quotient;
+    
+    // Modulo
+    int remainder = a % b;
+    print "Modulo: 15 % 4 = ";
+    print remainder;
+    
+    // Complex expressions
+    int complex1 = (a + b) * (a - b);
+    print "Complex: (15 + 4) * (15 - 4) = ";
+    print complex1;
+    
+    int complex2 = a * b + a / b;
+    print "Complex: 15 * 4 + 15 / 4 = ";
+    print complex2;
+    
+    // Order of operations
+    int order = a + b * 2 - 3;
+    print "Order test: 15 + 4 * 2 - 3 = ";
+    print order;
+    
+    return 0;
+}

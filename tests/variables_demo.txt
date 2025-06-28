@@ -1,0 +1,42 @@
+// 📊 Variables and Data Types Demo
+// Learn how to declare and use different types of variables
+
+// Integer variables
+int age = 25;
+int score = 100;
+int temperature = -5;
+
+// Boolean variables  
+bool isStudent = true;
+bool hasLicense = false;
+
+// Character and string handling
+char grade = 'A';
+string name = "Alice";
+
+// Display all variables
+print "=== Personal Information ===";
+print "Name: ";
+print name;
+print "Age: ";
+print age;
+print "Grade: ";
+print grade;
+print "Score: ";
+print score;
+print "Is Student: ";
+print isStudent;
+print "Has License: ";
+print hasLicense;
+print "Temperature: ";
+print temperature;
+
+// Variable operations
+age = age + 1;  // Birthday!
+score = score - 10;  // Lost some points
+
+print "=== After Updates ===";
+print "New Age: ";
+print age;
+print "New Score: ";
+print score;

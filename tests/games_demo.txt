@@ -1,0 +1,109 @@
+// 🎮 Simple Games and Interactive Programs
+// Fun examples that demonstrate programming concepts
+
+int main() {
+    print "=== Games Demo ===";
+    
+    // 1. Number Guessing Game (simplified)
+    print "Number Guessing Game:";
+    int secretNumber = 42;
+    int guess1 = 30;
+    int guess2 = 50;
+    int guess3 = 42;
+    
+    print "Secret number is 42";
+    print "Guess 1: 30";
+    if (guess1 == secretNumber) {
+        print "Correct!";
+    } else if (guess1 < secretNumber) {
+        print "Too low!";
+    } else {
+        print "Too high!";
+    }
+    
+    print "Guess 2: 50";
+    if (guess2 == secretNumber) {
+        print "Correct!";
+    } else if (guess2 < secretNumber) {
+        print "Too low!";
+    } else {
+        print "Too high!";
+    }
+    
+    print "Guess 3: 42";
+    if (guess3 == secretNumber) {
+        print "🎉 Correct! You won!";
+    }
+    print "";
+    
+    // 2. Rock Paper Scissors
+    print "Rock Paper Scissors:";
+    int player = 1;    // 1=Rock, 2=Paper, 3=Scissors
+    int computer = 2;  // Computer chooses Paper
+    
+    print "Player: Rock, Computer: Paper";
+    
+    if (player == computer) {
+        print "It's a tie!";
+    } else if ((player == 1 && computer == 3) || 
+               (player == 2 && computer == 1) || 
+               (player == 3 && computer == 2)) {
+        print "Player wins!";
+    } else {
+        print "Computer wins!";
+    }
+    print "";
+    
+    // 3. Simple Dice Game
+    print "Dice Rolling Game:";
+    int dice1 = 4;  // Simulated dice roll
+    int dice2 = 6;  // Simulated dice roll
+    int total = dice1 + dice2;
+    
+    print "Dice 1: ";
+    print dice1;
+    print "Dice 2: ";
+    print dice2;
+    print "Total: ";
+    print total;
+    
+    if (total == 7 || total == 11) {
+        print "🎲 Lucky! You rolled a natural!";
+    } else if (total == 2 || total == 3 || total == 12) {
+        print "😞 Craps! Better luck next time!";
+    } else {
+        print "🎯 Your point is ";
+        print total;
+    }
+    print "";
+    
+    // 4. Simple Calculator Game
+    print "Math Quiz Game:";
+    int question1 = 7 * 8;
+    int answer1 = 56;
+    
+    print "What is 7 × 8?";
+    print "Your answer: 56";
+    if (answer1 == question1) {
+        print "✅ Correct!";
+    } else {
+        print "❌ Wrong! The answer is ";
+        print question1;
+    }
+    
+    int question2 = 144 / 12;
+    int answer2 = 12;
+    
+    print "What is 144 ÷ 12?";
+    print "Your answer: 12";
+    if (answer2 == question2) {
+        print "✅ Correct!";
+    } else {
+        print "❌ Wrong! The answer is ";
+        print question2;
+    }
+    
+    print "🏆 Quiz complete!";
+    
+    return 0;
+}

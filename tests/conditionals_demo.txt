@@ -1,0 +1,73 @@
+// 🤔 Conditionals and Decision Making
+// Learn how to make your programs smart with if-else statements
+
+int main() {
+    print "=== Conditionals Demo ===";
+    
+    // Simple if-else
+    int age = 18;
+    print "Age check:";
+    if (age >= 18) {
+        print "You are an adult!";
+    } else {
+        print "You are a minor.";
+    }
+    print "";
+    
+    // Grade evaluation
+    int score = 85;
+    print "Grade evaluation for score 85:";
+    if (score >= 90) {
+        print "Grade: A";
+    } else if (score >= 80) {
+        print "Grade: B";
+    } else if (score >= 70) {
+        print "Grade: C";
+    } else if (score >= 60) {
+        print "Grade: D";
+    } else {
+        print "Grade: F";
+    }
+    print "";
+    
+    // Number comparison
+    int x = 10;
+    int y = 15;
+    print "Comparing x=10 and y=15:";
+    if (x > y) {
+        print "x is greater than y";
+    } else if (x < y) {
+        print "x is less than y";
+    } else {
+        print "x equals y";
+    }
+    print "";
+    
+    // Even/odd check
+    int number = 7;
+    print "Checking if 7 is even or odd:";
+    if (number % 2 == 0) {
+        print "7 is even";
+    } else {
+        print "7 is odd";
+    }
+    print "";
+    
+    // Nested conditions - weather advice
+    int temperature = 25;
+    bool isRaining = false;
+    print "Weather advice for 25°C, not raining:";
+    if (temperature > 30) {
+        print "It's hot! Stay hydrated.";
+    } else if (temperature > 20) {
+        if (isRaining) {
+            print "Nice weather but bring an umbrella!";
+        } else {
+            print "Perfect weather for a walk!";
+        }
+    } else {
+        print "It's cool, wear a jacket.";
+    }
+    
+    return 0;
+}

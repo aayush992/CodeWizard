@@ -1,0 +1,186 @@
+{
+  "examples": [
+    {
+      "id": "hello_world",
+      "title": "🌟 Hello World",
+      "description": "Your first program! Learn the basics of output and variables.",
+      "difficulty": "Beginner",
+      "category": "Basics",
+      "file": "hello_world.txt",
+      "concepts": ["print statements", "variables", "return statement"]
+    },
+    {
+      "id": "variables_demo",
+      "title": "📊 Variables & Data Types",
+      "description": "Explore different variable types and how to use them.",
+      "difficulty": "Beginner",
+      "category": "Basics",
+      "file": "variables_demo.txt",
+      "concepts": ["int", "bool", "char", "string", "variable assignment"]
+    },
+    {
+      "id": "basic_arithmetic",
+      "title": "➕ Basic Arithmetic",
+      "description": "Simple math operations and expressions.",
+      "difficulty": "Beginner",
+      "category": "Arithmetic",
+      "file": "basic_arithmetic.txt",
+      "concepts": ["addition", "subtraction", "multiplication", "division", "modulo"]
+    },
+    {
+      "id": "calculator",
+      "title": "🧮 Advanced Calculator",
+      "description": "Complex arithmetic expressions and order of operations.",
+      "difficulty": "Intermediate",
+      "category": "Arithmetic",
+      "file": "calculator.txt",
+      "concepts": ["complex expressions", "operator precedence", "parentheses"]
+    },
+    {
+      "id": "conditionals_demo",
+      "title": "🤔 Conditionals & Decision Making",
+      "description": "Make your programs smart with if-else statements.",
+      "difficulty": "Beginner",
+      "category": "Control Flow",
+      "file": "conditionals_demo.txt",
+      "concepts": ["if-else", "nested conditions", "comparison operators"]
+    },
+    {
+      "id": "control_flow",
+      "title": "🔀 Advanced Control Flow",
+      "description": "Master complex control structures and nested logic.",
+      "difficulty": "Intermediate",
+      "category": "Control Flow",
+      "file": "control_flow.txt",
+      "concepts": ["nested if-else", "while loops", "for loops"]
+    },
+    {
+      "id": "loops_demo",
+      "title": "🔄 Loops & Iteration",
+      "description": "Learn different types of loops and their applications.",
+      "difficulty": "Intermediate",
+      "category": "Control Flow",
+      "file": "loops_demo.txt",
+      "concepts": ["while loops", "for loops", "nested loops", "loop applications"]
+    },
+    {
+      "id": "logical_operations",
+      "title": "🧠 Logical Operations",
+      "description": "Master AND, OR, NOT operations and boolean logic.",
+      "difficulty": "Intermediate",
+      "category": "Logic",
+      "file": "logical_operations.txt",
+      "concepts": ["boolean logic", "AND", "OR", "NOT", "truth tables"]
+    },
+    {
+      "id": "logical_ops_new",
+      "title": "🔗 Logical Operators Extended",
+      "description": "Extended examples of logical operations.",
+      "difficulty": "Intermediate",
+      "category": "Logic",
+      "file": "logical_ops_new.txt",
+      "concepts": ["complex boolean expressions", "short-circuit evaluation"]
+    },
+    {
+      "id": "algorithms_demo",
+      "title": "🔍 Classic Algorithms",
+      "description": "Implement famous algorithms like Fibonacci and binary search.",
+      "difficulty": "Advanced",
+      "category": "Algorithms",
+      "file": "algorithms_demo.txt",
+      "concepts": ["Fibonacci", "prime numbers", "GCD", "binary search"]
+    },
+    {
+      "id": "games_demo",
+      "title": "🎮 Simple Games",
+      "description": "Fun interactive programs and games.",
+      "difficulty": "Intermediate",
+      "category": "Fun",
+      "file": "games_demo.txt",
+      "concepts": ["game logic", "user interaction", "random events"]
+    },
+    {
+      "id": "array_ops",
+      "title": "📋 Array Operations",
+      "description": "Working with arrays and collections.",
+      "difficulty": "Advanced",
+      "category": "Data Structures",
+      "file": "array_ops.txt",
+      "concepts": ["arrays", "indexing", "iteration"]
+    },
+    {
+      "id": "functions",
+      "title": "⚙️ Functions",
+      "description": "Create reusable code with functions.",
+      "difficulty": "Advanced",
+      "category": "Functions",
+      "file": "functions.txt",
+      "concepts": ["function definition", "parameters", "return values"]
+    },
+    {
+      "id": "type_checking",
+      "title": "🔍 Type Checking",
+      "description": "Understanding type safety and error detection.",
+      "difficulty": "Advanced",
+      "category": "Advanced",
+      "file": "type_checking.txt",
+      "concepts": ["type safety", "type errors", "type conversion"]
+    },
+    {
+      "id": "error_handling",
+      "title": "⚠️ Error Handling",
+      "description": "Learn how the compiler detects and reports errors.",
+      "difficulty": "Advanced",
+      "category": "Advanced",
+      "file": "error_handling.txt",
+      "concepts": ["syntax errors", "semantic errors", "error recovery"]
+    }
+  ],
+  "categories": [
+    {
+      "name": "Basics",
+      "description": "Start here! Learn the fundamentals of programming.",
+      "color": "#4CAF50"
+    },
+    {
+      "name": "Arithmetic",
+      "description": "Mathematical operations and expressions.",
+      "color": "#2196F3"
+    },
+    {
+      "name": "Control Flow",
+      "description": "Conditionals, loops, and program flow control.",
+      "color": "#FF9800"
+    },
+    {
+      "name": "Logic",
+      "description": "Boolean logic and logical operations.",
+      "color": "#9C27B0"
+    },
+    {
+      "name": "Algorithms",
+      "description": "Classic computer science algorithms.",
+      "color": "#F44336"
+    },
+    {
+      "name": "Fun",
+      "description": "Games and interactive programs.",
+      "color": "#E91E63"
+    },
+    {
+      "name": "Data Structures",
+      "description": "Arrays, lists, and data organization.",
+      "color": "#607D8B"
+    },
+    {
+      "name": "Functions",
+      "description": "Modular programming with functions.",
+      "color": "#795548"
+    },
+    {
+      "name": "Advanced",
+      "description": "Advanced topics and error handling.",
+      "color": "#424242"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+// 🧠 Logical Operations and Boolean Logic
+// Master AND, OR, NOT operations and complex conditions
+
+int main() {
+    print "=== Logical Operations Demo ===";
+    
+    // Boolean variables
+    bool isStudent = true;
+    bool hasID = true;
+    bool isPaid = false;
+    
+    // AND operation
+    print "Library access check:";
+    print "Student: true, Has ID: true, Paid: false";
+    if (isStudent && hasID) {
+        print "✓ Basic access granted";
+    } else {
+        print "✗ Access denied";
+    }
+    print "";
+    
+    // OR operation  
+    print "Discount eligibility:";
+    if (isStudent || isPaid) {
+        print "✓ Eligible for discount";
+    } else {
+        print "✗ No discount available";
+    }
+    print "";
+    
+    // NOT operation
+    print "Checking if NOT a student:";
+    if (!isStudent) {
+        print "Not a student";
+    } else {
+        print "Is a student";
+    }
+    print "";
+    
+    // Complex logical expressions
+    int age = 20;
+    bool hasLicense = true;
+    bool hasInsurance = true;
+    
+    print "Car rental eligibility:";
+    print "Age: 20, License: true, Insurance: true";
+    if ((age >= 18) && hasLicense && hasInsurance) {
+        print "✓ Can rent a car";
+    } else {
+        print "✗ Cannot rent a car";
+    }
+    print "";
+    
+    // Multiple conditions with parentheses
+    int score = 75;
+    bool extraCredit = true;
+    bool attendance = true;
+    
+    print "Pass/Fail determination:";
+    print "Score: 75, Extra Credit: true, Attendance: true";
+    if ((score >= 70) || (score >= 60 && extraCredit && attendance)) {
+        print "✓ PASSED";
+    } else {
+        print "✗ FAILED";
+    }
+    print "";
+    
+    // Truth table demonstration
+    print "Truth table for AND operation:";
+    print "true && true = ";
+    print (true && true);
+    print "true && false = ";
+    print (true && false);
+    print "false && true = ";
+    print (false && true);
+    print "false && false = ";
+    print (false && false);
+    
+    return 0;
+}

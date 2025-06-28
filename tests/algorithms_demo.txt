@@ -1,0 +1,105 @@
+// 🔍 Classic Algorithms Demo
+// Implement famous algorithms to see compilation in action
+
+int main() {
+    print "=== Classic Algorithms Demo ===";
+    
+    // 1. Fibonacci sequence
+    print "Fibonacci sequence (first 10 numbers):";
+    int fib1 = 0;
+    int fib2 = 1;
+    int i;
+    
+    print fib1;
+    print fib2;
+    
+    for (i = 2; i < 10; i = i + 1) {
+        int next = fib1 + fib2;
+        print next;
+        fib1 = fib2;
+        fib2 = next;
+    }
+    print "";
+    
+    // 2. Prime number check
+    print "Prime number check for 17:";
+    int num = 17;
+    bool isPrime = true;
+    int divisor = 2;
+    
+    if (num <= 1) {
+        isPrime = false;
+    } else {
+        while (divisor * divisor <= num) {
+            if (num % divisor == 0) {
+                isPrime = false;
+                break;
+            }
+            divisor = divisor + 1;
+        }
+    }
+    
+    if (isPrime) {
+        print "17 is prime!";
+    } else {
+        print "17 is not prime.";
+    }
+    print "";
+    
+    // 3. Greatest Common Divisor (GCD)
+    print "GCD of 48 and 18:";
+    int a = 48;
+    int b = 18;
+    
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    
+    print "GCD = ";
+    print a;
+    print "";
+    
+    // 4. Binary search simulation
+    print "Binary search for 7 in sorted array [1,3,5,7,9]:";
+    int target = 7;
+    int left = 0;
+    int right = 4;  // array size - 1
+    bool found = false;
+    
+    // Simulated array: [1,3,5,7,9]
+    while (left <= right && !found) {
+        int mid = (left + right) / 2;
+        int midValue;
+        
+        // Simulate array access
+        if (mid == 0) midValue = 1;
+        else if (mid == 1) midValue = 3;
+        else if (mid == 2) midValue = 5;
+        else if (mid == 3) midValue = 7;
+        else midValue = 9;
+        
+        print "Checking position ";
+        print mid;
+        print " (value ";
+        print midValue;
+        print ")";
+        
+        if (midValue == target) {
+            found = true;
+            print "Found 7 at position ";
+            print mid;
+        } else if (midValue < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    if (!found) {
+        print "Target not found";
+    }
+    
+    return 0;
+}

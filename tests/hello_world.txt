@@ -1,0 +1,13 @@
+// 🌟 Hello World - Your First Program
+// This is the classic first program that every programmer writes!
+
+int main() {
+    print "Hello, CodeWizard!";
+    print "Welcome to compiler design!";
+    
+    int year = 2025;
+    print "Current year: ";
+    print year;
+    
+    return 0;
+}

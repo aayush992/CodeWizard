@@ -1,0 +1,3411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWizard - Master the Magic of Compilation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ecf0f1;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .editor-panel {
+            background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 1px solid #4a5568;
+        }
+        .output-panel {
+            background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 1px solid #4a5568;
+        }
+        .editor-panel h3, .output-panel h4 {
+            color: #e2e8f0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .phase-tabs { display: flex; margin-bottom: 20px; flex-wrap: wrap; gap: 5px; }
+        .tab {
+            padding: 12px 18px;
+            background: linear-gradient(145deg, #718096 0%, #4a5568 100%);
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid #4a5568;
+        }
+        .tab:hover {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            transform: translateY(-2px);
+        }
+        .tab.active {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.4);
+        }
+        .code-editor {
+            width: 100%;
+            height: 320px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            padding: 15px;
+            background: #1a202c;
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        .code-editor:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        .token-list { max-height: 420px; overflow-y: auto; }
+        .token {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            margin: 3px 0;
+            border-radius: 6px;
+            border-left: 4px solid;
+            transition: all 0.2s ease;
+        }
+        .token:hover { transform: translateX(5px); }
+        .token.keyword {
+            background: linear-gradient(145deg, #553c9a 0%, #44337a 100%);
+            border-left-color: #805ad5;
+            color: #e9d8fd;
+        }
+        .token.identifier {
+            background: linear-gradient(145deg, #38a169 0%, #2f855a 100%);
+            border-left-color: #48bb78;
+            color: #c6f6d5;
+        }
+        .token.operator {
+            background: linear-gradient(145deg, #dd6b20 0%, #c05621 100%);
+            border-left-color: #ed8936;
+            color: #fed7aa;
+        }
+        .token.literal {
+            background: linear-gradient(145deg, #3182ce 0%, #2c5282 100%);
+            border-left-color: #4299e1;
+            color: #bee3f8;
+        }
+        .controls { margin: 20px 0; }
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.2);
+        }
+        .btn:hover {
+            background: linear-gradient(145deg, #3182ce 0%, #2c5282 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.3);
+        }
+        .error {
+            color: #fed7d7;
+            background: linear-gradient(145deg, #e53e3e 0%, #c53030 100%);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #fc8181;
+        }
+
+        /* Examples Panel Styles */
+        .examples-panel {
+            background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #4a5568;
+        }
+        .examples-panel h4 {
+            color: #e2e8f0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        .examples-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .category-btn {
+            padding: 8px 16px;
+            background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+            color: #cbd5e0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+        .examples-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .example-item {
+            background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .example-item:hover {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            border-color: #4299e1;
+            transform: translateY(-1px);
+        }
+        .example-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .example-description {
+            color: #a0aec0;
+            font-size: 0.9em;
+            margin-bottom: 6px;
+        }
+        .example-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.8em;
+        }
+        .example-difficulty {
+            color: #68d391;
+            font-weight: 500;
+        }
+        .example-concepts {
+            color: #90cdf4;
+        }
+
+        /* Execution Steps Styles */
+        .execution-steps {
+            margin-top: 20px;
+            background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .execution-steps h4 {
+            color: #e2e8f0;
+            margin-bottom: 10px;
+        }
+        .steps-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #4a5568;
+        }
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        .step-number {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .step-description {
+            color: #cbd5e0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .success {
+            color: #c6f6d5;
+            background: linear-gradient(145deg, #38a169 0%, #2f855a 100%);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #68d391;
+        }
+
+        /* Parse Tree and AST Styles */
+        .tree-container {
+            background: #1a202c;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 2px solid #4a5568;
+            overflow-x: auto;
+        }
+        .tree-node {
+            display: inline-block;
+            margin: 8px;
+            padding: 10px 15px;
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border-radius: 20px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+            position: relative;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        .tree-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+        .tree-node.terminal {
+            background: linear-gradient(145deg, #38a169 0%, #2f855a 100%);
+            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+        }
+        .tree-node.non-terminal {
+            background: linear-gradient(145deg, #805ad5 0%, #6b46c1 100%);
+            box-shadow: 0 4px 15px rgba(128, 90, 213, 0.3);
+        }
+        .tree-level {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* Tree connections - vertical lines from parent to children */
+        .tree-level:not(:first-child) .tree-node::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background: #4a5568;
+            transform: translateX(-50%);
+        }
+
+        /* Better tree structure */
+        .tree-container {
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Create vertical connections between levels */
+        .tree-level:not(:first-child) {
+            position: relative;
+            margin-top: 30px;
+        }
+
+        .tree-level:not(:first-child):before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            width: 2px;
+            height: 30px;
+            background: #4a5568;
+            transform: translateX(-50%);
+        }
+
+        /* Horizontal connections for multi-child levels */
+        .tree-level:nth-child(5):after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #4a5568;
+            z-index: 1;
+        }
+
+        /* Individual vertical lines for each child in multi-child levels */
+        .tree-level:nth-child(5) .tree-node:before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            width: 2px;
+            height: 15px;
+            background: #4a5568;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        /* Similar connections for the last level */
+        .tree-level:nth-child(6):after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #4a5568;
+            z-index: 1;
+        }
+
+        .tree-level:nth-child(6) .tree-node:before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            width: 2px;
+            height: 15px;
+            background: #4a5568;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .tree-level:last-child::after { display: none; }
+
+        /* Symbol Table Styles */
+        .symbol-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1a202c;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .symbol-table th {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .symbol-table td {
+            border: 1px solid #4a5568;
+            padding: 10px;
+            color: #e2e8f0;
+            background: #2d3748;
+        }
+        .symbol-table tr:nth-child(even) td {
+            background: #1a202c;
+        }
+        .symbol-table tr:hover td {
+            background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+        }
+
+        /* Enhanced Semantic Analysis Styles */
+        .analysis-steps {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a202c;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 8px 0;
+        }
+
+        .step h5 {
+            margin: 0 0 5px 0;
+            color: #4299e1;
+        }
+
+        .step p {
+            margin: 0;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        .type-badge {
+            background: #38a169;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-valid {
+            color: #38a169;
+            font-weight: 500;
+        }
+
+        .semantic-summary {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a202c;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+        }
+
+        .semantic-summary h5 {
+            margin: 0 0 10px 0;
+            color: #38a169;
+        }
+
+        .semantic-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .semantic-summary li {
+            margin: 5px 0;
+            color: #cbd5e0;
+        }
+
+        /* AST Summary Styles */
+        .ast-summary {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a202c;
+            border-radius: 8px;
+            border-left: 4px solid #9f7aea;
+        }
+
+        .ast-summary h5 {
+            margin: 0 0 10px 0;
+            color: #9f7aea;
+        }
+
+        .ast-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .ast-summary li {
+            margin: 5px 0;
+            color: #cbd5e0;
+        }
+
+        /* Operator node styling */
+        .tree-node.operator {
+            background: linear-gradient(145deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            font-weight: bold;
+            border: 2px solid #f6ad55;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            border: 2px solid #4a5568;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .modal-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body p {
+            margin: 0;
+            color: #cbd5e0;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            text-align: right;
+            border-top: 1px solid #4a5568;
+        }
+
+        .modal-btn {
+            background: linear-gradient(145deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        .modal-content.warning .modal-header {
+            border-bottom-color: #ed8936;
+        }
+
+        .modal-content.success .modal-header {
+            border-bottom-color: #38a169;
+        }
+
+        .modal-content.info .modal-header {
+            border-bottom-color: #4299e1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Tree Diagram Styles - New Method */
+        .tree-diagram {
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow-x: auto;
+            min-height: 400px;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tree-node {
+            background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+            color: #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 2px solid #718096;
+            font-weight: 500;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin: 10px;
+            position: relative;
+        }
+
+        .tree-node.root {
+            background: linear-gradient(145deg, #9f7aea 0%, #805ad5 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border: 3px solid #b794f6;
+            box-shadow: 0 6px 16px rgba(159, 122, 234, 0.4);
+        }
+
+        .tree-node.terminal {
+            background: linear-gradient(145deg, #38a169 0%, #2f855a 100%);
+            color: white;
+            border: 2px solid #68d391;
+        }
+
+        .tree-node.operator {
+            background: linear-gradient(145deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            font-weight: bold;
+            border: 2px solid #f6ad55;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .tree-children {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        /* Vertical line from parent to children */
+        .tree-children::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: #718096;
+        }
+
+        /* Horizontal line connecting all children */
+        .tree-children::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: #718096;
+        }
+
+        /* Vertical lines from horizontal line to each child */
+        .tree-children .tree::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: #718096;
+        }
+
+        /* New Tree Structure Styles */
+        .tree-structure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        .tree-row {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 10px 0;
+        }
+
+        .tree-row.three-nodes {
+            gap: 80px;
+        }
+
+        .tree-row.expression-nodes {
+            gap: 40px;
+            margin-left: 160px; /* Align under Expression node */
+        }
+
+        .tree-connector {
+            position: relative;
+            height: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .vertical-line {
+            width: 2px;
+            height: 15px;
+            background: #718096;
+        }
+
+        .horizontal-line {
+            position: absolute;
+            top: 15px;
+            height: 2px;
+            background: #718096;
+            width: 240px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .horizontal-line.small {
+            width: 120px;
+        }
+
+        .branch-line {
+            position: absolute;
+            top: 15px;
+            width: 2px;
+            height: 15px;
+            background: #718096;
+        }
+
+        .branch-line.left {
+            left: calc(50% - 120px);
+        }
+
+        .branch-line.center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .branch-line.right {
+            left: calc(50% + 120px);
+        }
+
+        .expression-connector {
+            margin-left: 160px; /* Align with Expression node */
+            width: 200px;
+        }
+
+        .branch-line.expr-left {
+            left: calc(50% - 60px);
+        }
+
+        .branch-line.expr-center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .branch-line.expr-right {
+            left: calc(50% + 60px);
+        }
+
+        /* AST specific styles */
+        .ast-operator-connector {
+            margin-left: 80px; /* Align with + operator */
+            width: 150px;
+        }
+
+        .tree-row.ast-operands {
+            gap: 60px;
+            margin-left: 80px; /* Align under + operator */
+        }
+
+        /* Real data styles */
+        .real-tokens, .real-parse-data, .real-ast-data, .real-semantic-data, .real-ir-data, .real-codegen-data {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+        }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .token-item-real {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .token-number {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .token-type-real {
+            background: #2196F3;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .token-value-real {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #FFD700;
+        }
+
+        .token-location-real {
+            color: #888;
+            font-size: 0.8em;
+        }
+
+        .token-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .token-stats span {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        /* Tree Visualization Styles */
+        .tree-structure, .ast-tree-structure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tree-row, .ast-tree-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 10px 0;
+        }
+
+        .tree-node, .ast-node {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9em;
+            min-width: 60px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tree-node.root, .ast-node.root {
+            background: #9C27B0;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .tree-node.terminal, .ast-node.terminal {
+            background: #FF9800;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .tree-connector, .ast-connector {
+            position: relative;
+            height: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .vertical-line {
+            width: 2px;
+            height: 15px;
+            background: #666;
+            position: absolute;
+            top: 0;
+        }
+
+        .horizontal-line {
+            height: 2px;
+            background: #666;
+            position: absolute;
+            top: 15px;
+            width: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .branch-line {
+            width: 2px;
+            height: 15px;
+            background: #666;
+            position: absolute;
+            top: 15px;
+        }
+
+        .branch-line.left {
+            left: 25%;
+        }
+
+        .branch-line.right {
+            right: 25%;
+        }
+
+        .branch-line.center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .grammar-rules-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .grammar-rule {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid #4CAF50;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .ast-details {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .ast-structure {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #E0E0E0;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+
+        .semantic-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 3px solid #2196F3;
+            border-radius: 6px;
+        }
+
+        .step-icon {
+            font-size: 1.2em;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .step-item p {
+            margin: 0;
+            color: #B0B0B0;
+            font-size: 0.9em;
+        }
+
+        .real-symbol-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .real-symbol-table th {
+            background: #2196F3;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .real-symbol-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .real-symbol-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .type-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .status-valid {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .symbol-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .symbol-stats span {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .parse-tree-visualization, .ast-tree-visualization {
+            margin: 15px 0;
+        }
+
+        /* Proper Parse Tree Styling - Educational Format */
+        .parse-tree-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tree-diagram-proper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 600px;
+        }
+
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            gap: 40px;
+        }
+
+        .tree-level.children-level {
+            gap: 30px;
+        }
+
+        .tree-node-proper {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.9em;
+            min-width: 50px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 2px solid #388E3C;
+        }
+
+        .tree-node-proper.root {
+            background: #9C27B0;
+            border-color: #7B1FA2;
+            font-size: 1em;
+            font-weight: 700;
+            min-width: 60px;
+            min-height: 60px;
+        }
+
+        .tree-node-proper.terminal {
+            background: #FF9800;
+            border-color: #F57C00;
+            font-size: 0.85em;
+            min-width: 45px;
+            min-height: 45px;
+        }
+
+        .tree-node-proper.non-terminal {
+            background: #2196F3;
+            border-color: #1976D2;
+        }
+
+        .tree-connections {
+            width: 100%;
+            height: 60px;
+            position: relative;
+        }
+
+        .connection-lines {
+            width: 100%;
+            height: 100%;
+        }
+
+        .connection-lines line {
+            stroke: #666;
+            stroke-width: 2;
+        }
+
+        /* Grammar Rules Display */
+        .grammar-rules-display {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .grammar-rules-display h5 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .grammar-rule-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #4CAF50;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #E0E0E0;
+        }
+
+        .derivation-steps {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid #2196F3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .derivation-steps h5 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .derivation-step {
+            padding: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #E0E0E0;
+        }
+
+        .parse-success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #4CAF50;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* IR Code Styling */
+        .ir-code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ir-instruction-real {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ir-instruction-real:last-child {
+            border-bottom: none;
+        }
+
+        .ir-line-num {
+            color: #888;
+            font-weight: bold;
+            min-width: 30px;
+        }
+
+        .ir-opcode {
+            color: #2196F3;
+            font-weight: 600;
+            min-width: 60px;
+        }
+
+        .ir-result {
+            color: #4CAF50;
+            min-width: 40px;
+        }
+
+        .ir-operands {
+            color: #FFD700;
+        }
+
+        .ir-comment {
+            color: #888;
+            font-style: italic;
+        }
+
+        .ir-code {
+            color: #E0E0E0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ir-success-message {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 15px 0;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .ir-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .ir-stats span {
+            color: #2196F3;
+            font-weight: 500;
+        }
+
+        /* Assembly Code Styling */
+        .assembly-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .assembly-code-real {
+            padding: 20px;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #E0E0E0;
+            white-space: pre-wrap;
+        }
+
+        .assembly-success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 15px 0;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .registers-used {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .register-badge {
+            background: #FF9800;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+
+        .codegen-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .codegen-stats span {
+            color: #FF9800;
+            font-weight: 500;
+        }
+
+        .tree-error {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        /* Execution Output Styling */
+        .execution-status {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .status-badge.executed {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .execution-results {
+            margin: 20px 0;
+        }
+
+        .variable-section, .expression-section, .program-output-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .variable-init, .expression-eval {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #E0E0E0;
+        }
+
+        .expr-step {
+            color: #B0B0B0;
+            font-size: 0.9em;
+            margin: 2px 0;
+        }
+
+        .expr-result {
+            color: #4CAF50;
+            font-weight: 600;
+            margin-top: 5px;
+            padding: 3px 0;
+            border-top: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .console-output {
+            margin: 15px 0;
+        }
+
+        .terminal-window {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-header {
+            background: #333;
+            padding: 8px 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .terminal-title {
+            color: #ccc;
+            font-size: 0.9em;
+        }
+
+        .terminal-content {
+            padding: 15px;
+            min-height: 60px;
+            background: #000;
+        }
+
+        .output-line {
+            color: #00ff00;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cursor-blink {
+            color: #00ff00;
+            animation: blink 1s infinite;
+        }
+
+        .execution-summary {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .execution-summary h5 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .execution-summary ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .execution-summary li {
+            padding: 5px 0;
+            color: #E0E0E0;
+        }
+
+        .execution-success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #4CAF50;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .token-number {
+            background: #4299e1;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .token-type-real {
+            background: #9f7aea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .token-value-real {
+            background: #38a169;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .token-location-real {
+            color: #a0aec0;
+            font-size: 11px;
+        }
+
+        .token-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .token-stats span {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .symbol-table-real {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .symbol-table-real th,
+        .symbol-table-real td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .symbol-table-real th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        .ir-code-block {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .ir-instruction-real {
+            display: flex;
+            gap: 10px;
+            padding: 2px 0;
+            align-items: center;
+        }
+
+        .ir-line-num {
+            color: #a0aec0;
+            min-width: 30px;
+        }
+
+        .ir-opcode {
+            color: #4299e1;
+            font-weight: bold;
+            min-width: 60px;
+        }
+
+        .ir-result {
+            color: #38a169;
+            min-width: 40px;
+        }
+
+        .ir-operands {
+            color: #e2e8f0;
+        }
+
+        .ir-comment {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        .assembly-code-real {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-x: auto;
+        }
+
+        .registers-used {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .register-badge {
+            background: #ed8936;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .ir-stats, .codegen-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .ir-stats span, .codegen-stats span {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Execution Output Styles */
+        .execution-container {
+            background: #1a202c;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .execution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2d3748;
+        }
+
+        .execution-header h5 {
+            margin: 0;
+            color: #4299e1;
+            font-size: 18px;
+        }
+
+        .status-indicator {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .status-indicator.success {
+            background: linear-gradient(145deg, #38a169 0%, #2f855a 100%);
+            color: white;
+        }
+
+        .execution-step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2d3748;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .step-label {
+            font-weight: bold;
+            color: #4299e1;
+            margin-bottom: 10px;
+        }
+
+        .step-content {
+            margin-left: 15px;
+        }
+
+        .variable-assignment, .expression-eval {
+            padding: 5px 10px;
+            margin: 5px 0;
+            background: #4a5568;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .expression-result {
+            padding: 8px 12px;
+            margin: 8px 0;
+            background: linear-gradient(145deg, #38a169 0%, #2f855a 100%);
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .program-output {
+            margin: 15px 0;
+        }
+
+        .output-terminal {
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #4a5568;
+        }
+
+        .terminal-header {
+            background: #2d3748;
+            padding: 8px 15px;
+            color: #cbd5e0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .terminal-content {
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .output-line {
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .cursor-blink {
+            animation: blink 1s infinite;
+            font-size: 20px;
+            color: #00ff00;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .execution-summary {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a202c;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+        }
+
+        .execution-summary h5 {
+            margin: 0 0 10px 0;
+            color: #38a169;
+        }
+
+        .execution-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .execution-summary li {
+            margin: 5px 0;
+            color: #cbd5e0;
+        }
+
+        /* IR Code Styles */
+        .ir-code {
+            background: #1a202c;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            color: #e2e8f0;
+            border: 2px solid #4a5568;
+            line-height: 1.6;
+        }
+        .ir-instruction {
+            margin: 5px 0;
+            padding: 5px 10px;
+            border-left: 3px solid #4299e1;
+            background: rgba(66, 153, 225, 0.1);
+            border-radius: 4px;
+        }
+
+        /* Assembly Code Styles */
+        .assembly-code {
+            background: #1a202c;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            color: #e2e8f0;
+            border: 2px solid #4a5568;
+            line-height: 1.6;
+        }
+        .asm-comment { color: #68d391; }
+        .asm-instruction { color: #4299e1; }
+        .asm-register { color: #ed8936; }
+        .asm-label { color: #805ad5; font-weight: bold; }
+
+        /* Phase content styling */
+        .phase-content { display: none; }
+        .phase-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧙‍♂️ CodeWizard</h1>
+            <p>Master the Magic of Compilation - Transform Code into Assembly with Interactive Learning</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="editor-panel">
+                <h3>📝 Source Code Editor</h3>
+
+                <!-- Examples Panel -->
+                <div class="examples-panel" id="examplesPanel" style="display: none;">
+                    <h4>📚 Choose an Example</h4>
+                    <div class="examples-categories" id="examplesCategories">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                    <div class="examples-list" id="examplesList">
+                        <!-- Examples will be loaded here -->
+                    </div>
+                    <button class="btn btn-secondary" onclick="hideExamples()">❌ Close</button>
+                </div>
+
+                <textarea class="code-editor" placeholder="Enter your code here...
+Example:
+int x = 10;
+int y = 20;
+int sum = x + y;
+print sum;">int x = 10;
+int y = 20;
+int sum = x + y;
+print sum;</textarea>
+
+                <div class="controls">
+                    <button class="btn" onclick="compileCode()">🚀 Compile</button>
+                    <button class="btn" onclick="stepThrough()">👣 Step Through</button>
+                    <button class="btn" onclick="showExamples()">📋 Load Example</button>
+                    <button class="btn" onclick="clearCode()">🗑️ Clear</button>
+                </div>
+            </div>
+            
+            <div class="output-panel">
+                <div class="phase-tabs">
+                    <button class="tab active" onclick="showPhase('lexer')">🔤 Lexer</button>
+                    <button class="tab" onclick="showPhase('parsetree')">� Parse Tree</button>
+                    <button class="tab" onclick="showPhase('semantic')">🔍 Semantic</button>
+                    <button class="tab" onclick="showPhase('ir')">⚙️ IR</button>
+                    <button class="tab" onclick="showPhase('codegen')">💻 CodeGen</button>
+                    <button class="tab" onclick="showPhase('output')">📊 Output</button>
+                </div>
+                
+                <div id="lexer-phase" class="phase-content">
+                    <h4>Lexical Analysis - Token Stream</h4>
+                    <div class="token-list">
+                        <div class="token keyword">
+                            <span><strong>INT</strong> → "int"</span>
+                            <span class="token-type">Keyword</span>
+                        </div>
+                        <div class="token identifier">
+                            <span><strong>ID</strong> → "x"</span>
+                            <span class="token-type">Identifier</span>
+                        </div>
+                        <div class="token operator">
+                            <span><strong>ASSIGN</strong> → "="</span>
+                            <span class="token-type">Operator</span>
+                        </div>
+                        <div class="token literal">
+                            <span><strong>NUMBER</strong> → "10"</span>
+                            <span class="token-type">Literal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="parsetree-phase" class="phase-content">
+                    <h4>Parse Tree - Complete Grammar Structure</h4>
+
+                    <!-- Tree visualization for sum = x + y -->
+                    <div class="tree-diagram">
+                        <div class="tree-structure">
+                            <!-- Level 1: Root -->
+                            <div class="tree-row">
+                                <div class="tree-node root">Program</div>
+                            </div>
+
+                            <!-- Connection line -->
+                            <div class="tree-connector">
+                                <div class="vertical-line"></div>
+                            </div>
+
+                            <!-- Level 2: Assignment -->
+                            <div class="tree-row">
+                                <div class="tree-node">Assignment</div>
+                            </div>
+
+                            <!-- Connection lines -->
+                            <div class="tree-connector">
+                                <div class="vertical-line"></div>
+                                <div class="horizontal-line"></div>
+                                <div class="branch-line left"></div>
+                                <div class="branch-line center"></div>
+                                <div class="branch-line right"></div>
+                            </div>
+
+                            <!-- Level 3: Assignment parts -->
+                            <div class="tree-row three-nodes">
+                                <div class="tree-node terminal">sum</div>
+                                <div class="tree-node terminal">=</div>
+                                <div class="tree-node">Expression</div>
+                            </div>
+
+                            <!-- Connection lines for Expression -->
+                            <div class="tree-connector expression-connector">
+                                <div class="vertical-line"></div>
+                                <div class="horizontal-line small"></div>
+                                <div class="branch-line expr-left"></div>
+                                <div class="branch-line expr-center"></div>
+                                <div class="branch-line expr-right"></div>
+                            </div>
+
+                            <!-- Level 4: Expression parts -->
+                            <div class="tree-row expression-nodes">
+                                <div class="tree-node terminal">x</div>
+                                <div class="tree-node terminal">+</div>
+                                <div class="tree-node terminal">y</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="parse-summary">
+                        <h5>🌲 Parse Tree Analysis:</h5>
+                        <ul>
+                            <li>✅ <strong>Grammar Rules:</strong> All production rules preserved</li>
+                            <li>✅ <strong>Syntax Elements:</strong> Operators, identifiers included</li>
+                            <li>✅ <strong>Hierarchical:</strong> Shows complete derivation from grammar</li>
+                            <li>✅ <strong>Non-terminals:</strong> Program, Assignment, Expression</li>
+                            <li>✅ <strong>Terminals:</strong> sum, =, x, +, y</li>
+                            <li>✅ <strong>Complete:</strong> Every token from source represented</li>
+                        </ul>
+                    </div>
+
+                    <div class="success">
+                        ✅ Parse tree generated successfully - Complete syntactic structure preserved
+                    </div>
+                </div>
+
+                <!-- AST Phase Removed - Not included in this educational compiler -->
+                
+                <div id="semantic-phase" class="phase-content">
+                    <h4>Semantic Analysis - Symbol Table Generation</h4>
+
+                    <div class="analysis-steps">
+                        <div class="step">
+                            <h5>🔍 Step 1: Declaration Analysis</h5>
+                            <p>Scanning for variable declarations and building symbol table...</p>
+                        </div>
+                        <div class="step">
+                            <h5>🔍 Step 2: Type Checking</h5>
+                            <p>Verifying type compatibility and usage...</p>
+                        </div>
+                        <div class="step">
+                            <h5>🔍 Step 3: Scope Resolution</h5>
+                            <p>Resolving variable scopes and checking for redeclarations...</p>
+                        </div>
+                    </div>
+
+                    <h5>📋 Generated Symbol Table:</h5>
+                    <table class="symbol-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Type</th>
+                                <th>Scope</th>
+                                <th>Initial Value</th>
+                                <th>Line Declared</th>
+                                <th>Memory Address</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>x</strong></td>
+                                <td><span class="type-badge">int</span></td>
+                                <td>global</td>
+                                <td>10</td>
+                                <td>1</td>
+                                <td>0x1000</td>
+                                <td><span class="status-valid">✅ Valid</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>y</strong></td>
+                                <td><span class="type-badge">int</span></td>
+                                <td>global</td>
+                                <td>20</td>
+                                <td>2</td>
+                                <td>0x1004</td>
+                                <td><span class="status-valid">✅ Valid</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>sum</strong></td>
+                                <td><span class="type-badge">int</span></td>
+                                <td>global</td>
+                                <td>x + y (30)</td>
+                                <td>3</td>
+                                <td>0x1008</td>
+                                <td><span class="status-valid">✅ Valid</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="semantic-summary">
+                        <h5>📊 Analysis Summary:</h5>
+                        <ul>
+                            <li>✅ <strong>3 symbols</strong> successfully declared</li>
+                            <li>✅ <strong>No type errors</strong> detected</li>
+                            <li>✅ <strong>No scope conflicts</strong> found</li>
+                            <li>✅ <strong>All variables initialized</strong> before use</li>
+                            <li>✅ <strong>Memory allocated:</strong> 12 bytes total</li>
+                        </ul>
+                    </div>
+
+                    <div class="success">
+                        ✅ Semantic analysis complete - Symbol table generated successfully!
+                    </div>
+                </div>
+                
+                <div id="ir-phase" class="phase-content">
+                    <h4>Intermediate Representation - Three Address Code</h4>
+                    <div class="ir-code">
+                        <div class="ir-instruction">t1 = 10</div>
+                        <div class="ir-instruction">x = t1</div>
+                        <div class="ir-instruction">t2 = 20</div>
+                        <div class="ir-instruction">y = t2</div>
+                        <div class="ir-instruction">t3 = x + y</div>
+                        <div class="ir-instruction">sum = t3</div>
+                        <div class="ir-instruction">print sum</div>
+                    </div>
+                    <div class="success">
+                        ✅ IR generated successfully - 7 three-address code instructions
+                    </div>
+                </div>
+
+                <div id="codegen-phase" class="phase-content">
+                    <h4>Code Generation - x86 Assembly</h4>
+                    <div class="assembly-code">
+<span class="asm-comment">; Data section</span>
+<span class="asm-label">section .data</span>
+
+<span class="asm-comment">; Text section</span>
+<span class="asm-label">section .text</span>
+<span class="asm-instruction">global</span> main
+
+<span class="asm-label">main:</span>
+    <span class="asm-instruction">push</span> <span class="asm-register">ebp</span>        <span class="asm-comment">; Function prologue</span>
+    <span class="asm-instruction">mov</span> <span class="asm-register">ebp</span>, <span class="asm-register">esp</span>
+
+    <span class="asm-instruction">mov</span> dword [<span class="asm-register">ebp</span>-4], 10    <span class="asm-comment">; x = 10</span>
+    <span class="asm-instruction">mov</span> dword [<span class="asm-register">ebp</span>-8], 20    <span class="asm-comment">; y = 20</span>
+    <span class="asm-instruction">mov</span> <span class="asm-register">eax</span>, [<span class="asm-register">ebp</span>-4]         <span class="asm-comment">; load x</span>
+    <span class="asm-instruction">add</span> <span class="asm-register">eax</span>, [<span class="asm-register">ebp</span>-8]         <span class="asm-comment">; add y</span>
+    <span class="asm-instruction">mov</span> [<span class="asm-register">ebp</span>-12], <span class="asm-register">eax</span>        <span class="asm-comment">; store sum</span>
+    <span class="asm-instruction">call</span> print_int           <span class="asm-comment">; print result</span>
+
+    <span class="asm-instruction">mov</span> <span class="asm-register">esp</span>, <span class="asm-register">ebp</span>        <span class="asm-comment">; Function epilogue</span>
+    <span class="asm-instruction">pop</span> <span class="asm-register">ebp</span>
+    <span class="asm-instruction">ret</span>
+                    </div>
+                    <div class="success">
+                        ✅ Assembly code generated - Ready for linking and execution
+                    </div>
+                </div>
+
+                <div id="output-phase" class="phase-content">
+                    <h4>Program Execution - Final Output</h4>
+
+                    <div class="execution-container">
+                        <div class="execution-header">
+                            <h5>🚀 Program Execution Results</h5>
+                            <div class="execution-status">
+                                <span class="status-indicator success">✅ EXECUTED</span>
+                            </div>
+                        </div>
+
+                        <div class="execution-details">
+                            <div class="execution-step">
+                                <div class="step-label">📝 Variable Initialization:</div>
+                                <div class="step-content">
+                                    <div class="variable-assignment">x = 10</div>
+                                    <div class="variable-assignment">y = 20</div>
+                                </div>
+                            </div>
+
+                            <div class="execution-step">
+                                <div class="step-label">🧮 Expression Evaluation:</div>
+                                <div class="step-content">
+                                    <div class="expression-eval">sum = x + y</div>
+                                    <div class="expression-eval">sum = 10 + 20</div>
+                                    <div class="expression-result">sum = 30</div>
+                                </div>
+                            </div>
+
+                            <div class="execution-step">
+                                <div class="step-label">📤 Program Output:</div>
+                                <div class="step-content">
+                                    <div class="program-output">
+                                        <div class="output-terminal">
+                                            <div class="terminal-header">
+                                                <span class="terminal-title">Console Output</span>
+                                            </div>
+                                            <div class="terminal-content">
+                                                <div class="output-line">30</div>
+                                                <div class="cursor-blink">_</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="execution-summary">
+                            <h5>📊 Execution Summary:</h5>
+                            <ul>
+                                <li>✅ <strong>Variables:</strong> 3 variables declared and initialized</li>
+                                <li>✅ <strong>Operations:</strong> 1 addition operation performed</li>
+                                <li>✅ <strong>Output:</strong> 1 value printed to console</li>
+                                <li>✅ <strong>Result:</strong> Program executed successfully</li>
+                                <li>✅ <strong>Final Value:</strong> 30 (10 + 20)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="success">
+                        ✅ Program executed successfully - Final output: 30
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showPhase(phase) {
+            // Hide all phases
+            document.querySelectorAll('.phase-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+            // Show selected phase
+            document.getElementById(phase + '-phase').style.display = 'block';
+            event.target.classList.add('active');
+
+            // Add phase-specific animations
+            const phaseElement = document.getElementById(phase + '-phase');
+            phaseElement.style.opacity = '0';
+            phaseElement.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                phaseElement.style.transition = 'all 0.4s ease';
+                phaseElement.style.opacity = '1';
+                phaseElement.style.transform = 'translateY(0)';
+            }, 10);
+        }
+        
+        async function compileCode() {
+            const code = document.querySelector('.code-editor').value;
+            if (!code.trim()) {
+                showAlert('⚠️ No Code Found', 'Please enter some code in the editor before compiling!', 'warning');
+                return;
+            }
+
+            // Reset all phase indicators before starting
+            resetPhaseIndicators();
+
+            // Show compilation started notification
+            showNotification('Compilation started...', 'info');
+
+            try {
+                // Make API call to backend (works both locally and in production)
+                const apiUrl = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+                const response = await fetch(`${apiUrl}/api/compile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update phase data with real results
+                    updatePhaseDataWithResults(result.phases);
+
+                    // Show success message
+                    showAlert('🚀 Compilation Complete!',
+                        'Code compiled successfully! Check each phase tab to see the detailed results.\n\n📊 All compilation phases completed successfully.',
+                        'success');
+                } else {
+                    showAlert('❌ Compilation Failed',
+                        `Compilation error: ${result.error}`,
+                        'error');
+                }
+            } catch (error) {
+                console.error('Compilation error:', error);
+                showAlert('❌ Connection Error',
+                    `Failed to connect to compiler backend: ${error.message}\n\nMake sure the backend server is running on port 3001.`,
+                    'error');
+            }
+        }
+
+        function updatePhaseData(phase) {
+            // Add visual feedback that phase is being processed
+            const tab = document.querySelector(`[onclick="showPhase('${phase}')"]`);
+            tab.style.background = 'linear-gradient(145deg, #38a169 0%, #2f855a 100%)';
+
+            // Only add checkmark if it doesn't already exist
+            if (!tab.innerHTML.includes('✅')) {
+                tab.innerHTML += ' ✅';
+            }
+        }
+
+        function updatePhaseDataWithResults(phases) {
+            console.log('Updating phases with results:', phases);
+
+            // Add detailed logging for debugging
+            Object.keys(phases).forEach(phase => {
+                console.log(`Phase ${phase}:`, phases[phase]);
+            });
+
+            // Update lexer phase
+            if (phases.lexer) {
+                console.log('Updating lexer with:', phases.lexer);
+                updatePhaseData('lexer');
+                updateLexerOutput(phases.lexer);
+            }
+
+            // Update parse tree phase (check both 'parser' and 'parsetree')
+            if (phases.parsetree || phases.parser) {
+                console.log('Updating parser with:', phases.parsetree || phases.parser);
+                updatePhaseData('parsetree');
+                updateParseTreeOutput(phases.parsetree || phases.parser);
+            }
+
+            // AST phase removed from this educational compiler
+
+            // Update semantic phase
+            if (phases.semantic) {
+                console.log('Updating semantic with:', phases.semantic);
+                updatePhaseData('semantic');
+                updateSemanticOutput(phases.semantic);
+            }
+
+            // Update IR phase
+            if (phases.ir) {
+                console.log('Updating IR with:', phases.ir);
+                updatePhaseData('ir');
+                updateIROutput(phases.ir);
+            }
+
+            // Update codegen phase
+            if (phases.codegen) {
+                console.log('Updating codegen with:', phases.codegen);
+                updatePhaseData('codegen');
+                updateCodegenOutput(phases.codegen);
+            }
+
+            // Update execution phase
+            if (phases.execution) {
+                console.log('Updating execution with:', phases.execution);
+                updatePhaseData('output');
+                updateExecutionOutput(phases.execution);
+            }
+        }
+
+        function updateLexerOutput(lexerData) {
+            const lexerPhase = document.getElementById('lexer-phase');
+            if (lexerPhase && lexerData.tokens) {
+                // Replace the entire content with real data
+                let tokensHTML = `
+                    <h3>🔤 Lexical Analysis Results</h3>
+                    <div class="real-tokens">
+                        <h4>Generated Tokens from Your Code:</h4>
+                        <div class="token-grid">
+                `;
+
+                lexerData.tokens.forEach((token, index) => {
+                    tokensHTML += `
+                        <div class="token-item-real">
+                            <span class="token-number">${index + 1}</span>
+                            <span class="token-type-real">${token.type}</span>
+                            <span class="token-value-real">"${token.value}"</span>
+                            <span class="token-location-real">L${token.line}:C${token.column}</span>
+                        </div>
+                    `;
+                });
+
+                tokensHTML += `
+                        </div>
+                        <div class="token-stats">
+                            <span>Total: ${lexerData.statistics.total_tokens}</span>
+                            <span>Keywords: ${lexerData.statistics.keywords}</span>
+                            <span>Identifiers: ${lexerData.statistics.identifiers}</span>
+                            <span>Operators: ${lexerData.statistics.operators}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Replace all content with real data
+                lexerPhase.innerHTML = tokensHTML;
+            }
+        }
+
+        function updateParseTreeOutput(parseTreeData) {
+            console.log('updateParseTreeOutput called with:', parseTreeData);
+
+            const parseTreePhase = document.getElementById('parsetree-phase');
+            if (!parseTreePhase) {
+                console.error('Parse tree phase element not found');
+                return;
+            }
+
+            if (!parseTreeData) {
+                console.error('No parse tree data provided');
+                return;
+            }
+
+            console.log('Parse tree data structure:', {
+                grammar_rules_applied: parseTreeData.grammar_rules_applied,
+                derivation_steps: parseTreeData.derivation_steps,
+                parse_tree: parseTreeData.parse_tree
+            });
+
+            // Generate dynamic parse tree based on actual code structure
+            let parseTreeHTML = `
+                <h3>🌲 Parse Tree - Complete Grammar Structure</h3>
+                <div class="real-parse-data">
+
+                    <div class="grammar-rules-display">
+                        <h5>📝 Grammar Production Rules Applied:</h5>
+            `;
+
+            // Add grammar rules
+            if (parseTreeData.grammar_rules_applied && parseTreeData.grammar_rules_applied.length > 0) {
+                parseTreeData.grammar_rules_applied.forEach(rule => {
+                    parseTreeHTML += `<div class="grammar-rule-item">${rule}</div>`;
+                });
+            } else {
+                parseTreeHTML += `<div class="grammar-rule-item">No grammar rules available</div>`;
+            }
+
+            parseTreeHTML += `
+                    </div>
+
+                    <div class="parse-tree-visualization">
+                        <h4>🌲 Generated Parse Tree (Educational Format):</h4>
+                        <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">
+                            This tree shows the grammatical structure of your code using formal grammar rules.
+                        </p>
+                        ${generateDynamicParseTree(parseTreeData.parse_tree)}
+                    </div>
+            `;
+
+            // Add derivation steps if available
+            if (parseTreeData.derivation_steps && parseTreeData.derivation_steps.length > 0) {
+                parseTreeHTML += `
+                    <div class="derivation-steps">
+                        <h5>📋 Derivation Steps:</h5>
+                `;
+                parseTreeData.derivation_steps.forEach(step => {
+                    parseTreeHTML += `<div class="derivation-step">${step}</div>`;
+                });
+                parseTreeHTML += '</div>';
+            } else {
+                parseTreeHTML += `
+                    <div class="derivation-steps">
+                        <h5>📋 Derivation Steps:</h5>
+                        <div class="derivation-step">No derivation steps available</div>
+                    </div>
+                `;
+            }
+
+            parseTreeHTML += `
+                    <div class="parse-success">
+                        ✅ Parse tree generated successfully - Complete syntactic structure preserved
+                    </div>
+                </div>
+            `;
+
+            // Replace content with real parse tree
+            console.log('Setting parse tree HTML');
+            parseTreePhase.innerHTML = parseTreeHTML;
+        }
+
+        function generateDynamicParseTree(parseTree) {
+            // Always use canvas-based tree visualization
+            return generateCanvasParseTree(parseTree);
+        }
+
+        function generateCanvasParseTree(parseTree) {
+            const canvasId = 'parseTreeCanvas_' + Date.now();
+
+            // Return HTML with canvas element
+            const html = `
+                <div class="parse-tree-container">
+                    <canvas id="${canvasId}" width="800" height="400"
+                            style="border: 1px solid #4a5568; background: #1a202c; border-radius: 8px; display: block; margin: 0 auto;">
+                    </canvas>
+                </div>
+            `;
+
+            // Schedule canvas drawing after DOM update
+            setTimeout(() => {
+                drawParseTreeOnCanvas(canvasId, parseTree);
+            }, 100);
+
+            return html;
+        }
+
+        function drawParseTreeOnCanvas(canvasId, parseTree) {
+            console.log('drawParseTreeOnCanvas called with:', canvasId, parseTree);
+
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error('Canvas not found:', canvasId);
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Set up drawing styles
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Colors
+            const nodeColor = '#4299e1';
+            const terminalColor = '#48bb78';
+            const lineColor = '#718096';
+            const textColor = '#e2e8f0';
+
+            // Build proper tree levels from actual parse tree structure
+            const levels = [];
+
+            if (!parseTree || !parseTree.children) {
+                console.log('Using fallback tree structure');
+                // Fallback for empty tree
+                levels.push([{ type: 'Program', isTerminal: false }]);
+            } else {
+                console.log('Building tree levels from parse tree:', parseTree);
+                // Traverse the actual parse tree structure
+                buildTreeLevels(parseTree, levels, 0);
+            }
+
+            // Ensure we have at least some levels to draw
+            if (levels.length === 0) {
+                console.log('No levels found, adding default');
+                levels.push([{ type: 'S', isTerminal: false }]);
+                levels.push([{ type: 'A', isTerminal: false }, { type: 'B', isTerminal: false }]);
+            }
+
+            console.log('Final tree levels:', levels);
+
+            function buildTreeLevels(node, levels, depth) {
+                // Ensure level exists
+                if (!levels[depth]) {
+                    levels[depth] = [];
+                }
+
+                // Add current node to its level
+                levels[depth].push(node);
+
+                // Recursively add children
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(child => {
+                        buildTreeLevels(child, levels, depth + 1);
+                    });
+                }
+            }
+
+            // Calculate positions and draw tree
+            const levelHeight = Math.max(60, height / (levels.length + 1));
+            const nodeRadius = 20;
+            const nodePositions = new Map(); // Store positions for connection drawing
+
+            // Draw each level
+            levels.forEach((level, levelIndex) => {
+                const y = levelHeight * (levelIndex + 1);
+                const nodeWidth = width / (level.length + 1);
+
+                level.forEach((node, nodeIndex) => {
+                    const x = nodeWidth * (nodeIndex + 1);
+
+                    // Store position for this node
+                    nodePositions.set(node, { x, y });
+
+                    // Draw node circle
+                    ctx.beginPath();
+                    ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = node.isTerminal ? terminalColor : nodeColor;
+                    ctx.fill();
+                    ctx.strokeStyle = lineColor;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Draw node text (handle long text)
+                    ctx.fillStyle = textColor;
+                    const text = node.type || node.value || 'Node';
+                    if (text.length > 8) {
+                        ctx.font = '12px Arial';
+                    } else {
+                        ctx.font = '14px Arial';
+                    }
+                    ctx.fillText(text, x, y);
+                });
+            });
+
+            // Draw connections based on actual tree structure
+            function drawConnections(node, parentPos) {
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(child => {
+                        const childPos = nodePositions.get(child);
+                        if (childPos && parentPos) {
+                            drawLine(ctx,
+                                parentPos.x, parentPos.y + nodeRadius,
+                                childPos.x, childPos.y - nodeRadius,
+                                lineColor
+                            );
+                            // Recursively draw connections for child's children
+                            drawConnections(child, childPos);
+                        }
+                    });
+                }
+            }
+
+            // Start drawing connections from root
+            if (parseTree && nodePositions.has(parseTree)) {
+                drawConnections(parseTree, nodePositions.get(parseTree));
+            }
+
+            // Add title
+            ctx.font = 'bold 18px Arial';
+            ctx.fillStyle = '#4299e1';
+            ctx.textAlign = 'center';
+            ctx.fillText('Parse Tree Structure', width / 2, 30);
+        }
+
+        function drawLine(ctx, x1, y1, x2, y2, color) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function generateProperParseTree(parseTree) {
+            return `
+                <div class="parse-tree-container">
+                    <div class="tree-diagram-proper">
+                        ${generateTreeLevel(parseTree, 0)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateTreeLevel(node, level) {
+            if (!node) return '';
+
+            let html = `
+                <div class="tree-level level-${level}">
+                    <div class="tree-node-proper ${node.children && node.children.length > 0 ? 'non-terminal' : 'terminal'} ${level === 0 ? 'root' : ''}">
+                        ${node.value || node.type}
+                    </div>
+                </div>
+            `;
+
+            if (node.children && node.children.length > 0) {
+                // Add connection lines
+                html += `
+                    <div class="tree-connections">
+                        <svg class="connection-lines" width="100%" height="60">
+                            ${generateConnectionLines(node.children.length)}
+                        </svg>
+                    </div>
+                `;
+
+                // Add children level
+                html += '<div class="tree-level children-level">';
+                node.children.forEach(child => {
+                    html += `
+                        <div class="tree-node-proper ${child.children && child.children.length > 0 ? 'non-terminal' : 'terminal'}">
+                            ${child.value || child.type}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+
+                // Recursively add deeper levels for complex children
+                node.children.forEach(child => {
+                    if (child.children && child.children.length > 0) {
+                        html += generateTreeLevel(child, level + 1);
+                    }
+                });
+            }
+
+            return html;
+        }
+
+        function generateConnectionLines(childCount) {
+            if (childCount === 1) {
+                return '<line x1="50%" y1="10" x2="50%" y2="50" stroke="#666" stroke-width="2"/>';
+            }
+
+            let lines = '';
+            const spacing = 80 / (childCount + 1);
+            for (let i = 0; i < childCount; i++) {
+                const x = 10 + spacing * (i + 1);
+                lines += `<line x1="50%" y1="10" x2="${x}%" y2="50" stroke="#666" stroke-width="2"/>`;
+            }
+            return lines;
+        }
+
+        function generateSingleParseTree(parseTree) {
+            // Generate ONE complete tree with proper structure - exactly like the educational example
+            const root = parseTree.type || 'S';
+            const children = parseTree.children || [];
+
+            // Build simple 3-level tree: Root -> Non-terminals -> Terminals
+            let html = `
+                <div class="parse-tree-container">
+                    <div class="tree-diagram-proper">
+                        <!-- Root Level -->
+                        <div class="tree-level">
+                            <div class="tree-node-proper root">${root}</div>
+                        </div>
+            `;
+
+            if (children.length > 0) {
+                // Connection lines from root to children
+                html += `
+                    <div class="tree-connections">
+                        <svg class="connection-lines" width="100%" height="60">
+                `;
+
+                // Simple positioning for 2 children (A and B)
+                if (children.length === 2) {
+                    html += `
+                        <line x1="50%" y1="10" x2="35%" y2="50" stroke="#666" stroke-width="2"/>
+                        <line x1="50%" y1="10" x2="65%" y2="50" stroke="#666" stroke-width="2"/>
+                    `;
+                }
+
+                html += `
+                        </svg>
+                    </div>
+                    <!-- Second Level -->
+                    <div class="tree-level">
+                `;
+
+                // Add A and B nodes
+                children.forEach(child => {
+                    const displayValue = child.value || child.type;
+                    html += `<div class="tree-node-proper">${displayValue}</div>`;
+                });
+
+                html += `</div>`;
+
+                // Third level - terminals
+                html += `
+                    <div class="tree-connections">
+                        <svg class="connection-lines" width="100%" height="60">
+                            <line x1="35%" y1="10" x2="25%" y2="50" stroke="#666" stroke-width="2"/>
+                            <line x1="35%" y1="10" x2="45%" y2="50" stroke="#666" stroke-width="2"/>
+                            <line x1="65%" y1="10" x2="55%" y2="50" stroke="#666" stroke-width="2"/>
+                            <line x1="65%" y1="10" x2="75%" y2="50" stroke="#666" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <!-- Terminal Level -->
+                    <div class="tree-level">
+                        <div class="tree-node-proper terminal">int</div>
+                        <div class="tree-node-proper terminal">x</div>
+                        <div class="tree-node-proper terminal">=</div>
+                        <div class="tree-node-proper terminal">2</div>
+                    </div>
+                `;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function generateTreeChildren(children) {
+            if (!children || children.length === 0) return '';
+
+            try {
+                let html = '<div class="tree-connector"><div class="vertical-line"></div>';
+                if (children.length > 1) {
+                    html += '<div class="horizontal-line"></div>';
+                    children.forEach((_, index) => {
+                        const position = children.length === 1 ? 'center' :
+                                       index === 0 ? 'left' :
+                                       index === children.length - 1 ? 'right' : 'center';
+                        html += `<div class="branch-line ${position}"></div>`;
+                    });
+                } else {
+                    html += '<div class="branch-line center"></div>';
+                }
+                html += '</div>';
+
+                html += '<div class="tree-row">';
+                children.forEach(child => {
+                    const hasChildren = (child.children && child.children.length > 0) ||
+                                       (child.body && child.body.length > 0) ||
+                                       (child.left || child.right);
+                    const nodeClass = hasChildren ? 'tree-node' : 'tree-node terminal';
+                    const nodeText = child.type || child.value || child.name || 'Node';
+                    html += `<div class="${nodeClass}">${nodeText}</div>`;
+                });
+                html += '</div>';
+
+                // Recursively add children
+                children.forEach(child => {
+                    const childNodes = child.children || child.body || [];
+                    if (child.left && child.right) {
+                        childNodes.push(child.left, child.right);
+                    }
+                    if (childNodes.length > 0) {
+                        html += generateTreeChildren(childNodes);
+                    }
+                });
+
+                return html;
+            } catch (error) {
+                console.error('Error generating tree children:', error);
+                return '<div class="tree-error">Error generating tree structure</div>';
+            }
+        }
+
+        // AST functions removed - AST generation has been disabled for this educational compiler
+
+        function updateSemanticOutput(semanticData) {
+            const semanticPhase = document.getElementById('semantic-phase');
+            if (semanticPhase && semanticData.symbol_table) {
+                let semanticHTML = `
+                    <h3>🔍 Semantic Analysis - Symbol Table Generation</h3>
+                    <div class="real-semantic-data">
+                        <div class="semantic-steps">
+                            <div class="step-item">
+                                <span class="step-icon">�</span>
+                                <span class="step-title">Step 1: Declaration Analysis</span>
+                                <p>Scanning for variable declarations and building symbol table...</p>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-icon">🔍</span>
+                                <span class="step-title">Step 2: Type Checking</span>
+                                <p>Verifying type compatibility and usage...</p>
+                            </div>
+                            <div class="step-item">
+                                <span class="step-icon">🔍</span>
+                                <span class="step-title">Step 3: Scope Resolution</span>
+                                <p>Resolving variable scopes and checking for redeclarations...</p>
+                            </div>
+                        </div>
+
+                        <h4>📊 Generated Symbol Table from Your Code:</h4>
+                        <table class="real-symbol-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Type</th>
+                                    <th>Scope</th>
+                                    <th>Initial Value</th>
+                                    <th>Line Declared</th>
+                                    <th>Memory Address</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                semanticData.symbol_table.forEach((symbol, index) => {
+                    const memoryAddress = `0x${(1000 + index * 4).toString(16).toUpperCase()}`;
+                    const value = symbol.value !== undefined ? symbol.value :
+                                 symbol.initial_value !== undefined ? symbol.initial_value : 'uninitialized';
+                    semanticHTML += `
+                        <tr>
+                            <td><strong>${symbol.name}</strong></td>
+                            <td><span class="type-badge">${symbol.type}</span></td>
+                            <td>${symbol.scope}</td>
+                            <td>${value}</td>
+                            <td>${symbol.line}</td>
+                            <td>${memoryAddress}</td>
+                            <td><span class="status-valid">✅ Valid</span></td>
+                        </tr>
+                    `;
+                });
+
+                semanticHTML += `
+                            </tbody>
+                        </table>
+                        <div class="symbol-stats">
+                            <span>📊 Total Variables: ${semanticData.symbol_table.length}</span>
+                            <span>✅ All symbols validated successfully</span>
+                        </div>
+                `;
+
+                if (semanticData.warnings && semanticData.warnings.length > 0) {
+                    semanticHTML += '<h4>⚠️ Warnings:</h4><ul>';
+                    semanticData.warnings.forEach(warning => {
+                        semanticHTML += `<li class="warning-item">${warning.message}</li>`;
+                    });
+                    semanticHTML += '</ul>';
+                }
+
+                semanticHTML += '</div>';
+
+                // Replace content with real semantic analysis
+                semanticPhase.innerHTML = semanticHTML;
+            }
+        }
+
+        function updateIROutput(irData) {
+            const irPhase = document.getElementById('ir-phase');
+            if (irPhase && (irData.ir_code || irData.three_address_code)) {
+                let irHTML = `
+                    <h3>⚙️ Intermediate Representation - Three Address Code</h3>
+                    <div class="real-ir-data">
+                        <h4>Generated IR Code from Your Program:</h4>
+                        <div class="ir-code-block">
+                `;
+
+                // Handle different data formats from backend
+                const instructions = irData.ir_code || irData.three_address_code || [];
+
+                if (Array.isArray(instructions)) {
+                    instructions.forEach((instruction, index) => {
+                        if (typeof instruction === 'string') {
+                            // Handle simple string format
+                            irHTML += `
+                                <div class="ir-instruction-real">
+                                    <span class="ir-line-num">${index + 1}:</span>
+                                    <span class="ir-code">${instruction}</span>
+                                </div>
+                            `;
+                        } else {
+                            // Handle object format
+                            irHTML += `
+                                <div class="ir-instruction-real">
+                                    <span class="ir-line-num">${index + 1}:</span>
+                                    <span class="ir-opcode">${instruction.opcode || instruction.op || ''}</span>
+                                    <span class="ir-result">${instruction.result || instruction.dest || ''}</span>
+                                    <span class="ir-operands">${instruction.operand1 || instruction.arg1 || ''} ${instruction.operand2 || instruction.arg2 || ''}</span>
+                                    <span class="ir-comment">; ${instruction.comment || instruction.description || ''}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                } else if (typeof instructions === 'string') {
+                    // Handle single string with multiple lines
+                    instructions.split('\n').forEach((line, index) => {
+                        if (line.trim()) {
+                            irHTML += `
+                                <div class="ir-instruction-real">
+                                    <span class="ir-line-num">${index + 1}:</span>
+                                    <span class="ir-code">${line.trim()}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+
+                irHTML += `
+                        </div>
+                        <div class="ir-success-message">
+                            ✅ IR generated successfully - ${Array.isArray(instructions) ? instructions.length : instructions.split('\n').filter(l => l.trim()).length} three-address code instructions
+                        </div>
+                `;
+
+                if (irData.statistics) {
+                    irHTML += `
+                        <div class="ir-stats">
+                            <span>📊 Instructions: ${irData.statistics.total_instructions || 'N/A'}</span>
+                            <span>🔧 Temporaries: ${irData.statistics.temporaries_used || 'N/A'}</span>
+                        </div>
+                    `;
+                }
+
+                irHTML += '</div>';
+
+                // Replace content with real IR data
+                irPhase.innerHTML = irHTML;
+            }
+        }
+
+        function updateCodegenOutput(codegenData) {
+            const codegenPhase = document.getElementById('codegen-phase');
+            if (codegenPhase && (codegenData.assembly_code || codegenData.generated_code)) {
+                let asmHTML = `
+                    <h3>💻 Code Generation - Assembly Code</h3>
+                    <div class="real-codegen-data">
+                        <h4>Generated Assembly Code:</h4>
+                        <div class="assembly-display">
+                            <pre class="assembly-code-real">${codegenData.assembly_code || codegenData.generated_code}</pre>
+                        </div>
+                        <div class="assembly-success">
+                            ✅ Assembly code generated - Ready for linking and execution
+                        </div>
+                `;
+
+                if (codegenData.registers_used && codegenData.registers_used.length > 0) {
+                    asmHTML += `
+                        <h4>📋 Registers Used:</h4>
+                        <div class="registers-used">
+                    `;
+                    codegenData.registers_used.forEach(reg => {
+                        asmHTML += `<span class="register-badge">${reg}</span>`;
+                    });
+                    asmHTML += '</div>';
+                }
+
+                if (codegenData.statistics || codegenData.target_architecture || codegenData.code_size) {
+                    asmHTML += `
+                        <div class="codegen-stats">
+                            <span>🎯 Target: ${codegenData.target_architecture || 'x86-64'}</span>
+                            <span>📏 Lines: ${codegenData.code_size || 'N/A'}</span>
+                            ${codegenData.statistics ? `<span>📊 Instructions: ${codegenData.statistics.total_instructions || 'N/A'}</span>` : ''}
+                        </div>
+                    `;
+                }
+
+                asmHTML += '</div>';
+
+                // Replace content with real assembly code
+                codegenPhase.innerHTML = asmHTML;
+            }
+        }
+
+        function updateExecutionOutput(executionData) {
+            const executionPhase = document.getElementById('output-phase');
+            if (executionPhase && executionData) {
+                let executionHTML = `
+                    <h3>🚀 Program Execution - Final Output</h3>
+                    <div class="real-execution-data">
+                        <div class="execution-status">
+                            <span class="status-badge executed">✅ EXECUTED</span>
+                        </div>
+
+                        <div class="execution-results">
+                            <h4>🚀 Program Execution Results</h4>
+                `;
+
+                // Variable initialization section
+                if (executionData.variables || executionData.variable_values) {
+                    executionHTML += `
+                        <div class="variable-section">
+                            <h5>📊 Variable Initialization:</h5>
+                    `;
+                    const variables = executionData.variables || executionData.variable_values || {};
+                    Object.keys(variables).forEach(varName => {
+                        executionHTML += `
+                            <div class="variable-init">
+                                <strong>${varName}</strong> = ${variables[varName]}
+                            </div>
+                        `;
+                    });
+                    executionHTML += '</div>';
+                }
+
+                // Expression evaluation section
+                if (executionData.expressions || executionData.evaluations) {
+                    executionHTML += `
+                        <div class="expression-section">
+                            <h5>🧮 Expression Evaluation:</h5>
+                    `;
+                    const expressions = executionData.expressions || executionData.evaluations || [];
+                    expressions.forEach(expr => {
+                        if (expr.expression && expr.step1 && expr.result !== undefined) {
+                            executionHTML += `
+                                <div class="expression-eval">
+                                    <div class="expr-step">${expr.expression}</div>
+                                    <div class="expr-step">${expr.step1}</div>
+                                    <div class="expr-result"><strong>${expr.expression.split(' = ')[0]} = ${expr.result}</strong></div>
+                                </div>
+                            `;
+                        } else {
+                            executionHTML += `
+                                <div class="expression-eval">
+                                    ${expr.expression || expr} = ${expr.result || expr.value || 'N/A'}
+                                </div>
+                            `;
+                        }
+                    });
+                    executionHTML += '</div>';
+                }
+
+                // Program output section
+                executionHTML += `
+                    <div class="program-output-section">
+                        <h5>📺 Program Output:</h5>
+                        <div class="console-output">
+                            <div class="terminal-window">
+                                <div class="terminal-header">
+                                    <span class="terminal-title">Console Output</span>
+                                </div>
+                                <div class="terminal-content">`;
+
+                // Handle multiple output lines
+                if (executionData.output_lines && executionData.output_lines.length > 0) {
+                    executionData.output_lines.forEach(line => {
+                        executionHTML += `<div class="output-line">${line}</div>`;
+                    });
+                } else if (executionData.output) {
+                    // Handle single output or newline-separated output
+                    const lines = executionData.output.split('\n').filter(line => line.trim().length > 0);
+                    lines.forEach(line => {
+                        executionHTML += `<div class="output-line">${line}</div>`;
+                    });
+                } else {
+                    executionHTML += `<div class="output-line">No output</div>`;
+                }
+
+                executionHTML += `
+                                    <div class="cursor-blink">_</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Execution Steps -->
+                        <div class="execution-steps">
+                            <h4>📋 Execution Steps</h4>
+                            <div class="steps-container">`;
+
+                if (executionData.execution_steps && executionData.execution_steps.length > 0) {
+                    executionData.execution_steps.forEach((step, index) => {
+                        executionHTML += `
+                            <div class="step-item">
+                                <span class="step-number">${index + 1}</span>
+                                <span class="step-description">${step}</span>
+                            </div>`;
+                    });
+                } else {
+                    executionHTML += `<div class="step-item">No execution steps recorded</div>`;
+                }
+
+                executionHTML += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Execution summary
+                executionHTML += `
+                    <div class="execution-summary">
+                        <h5>📊 Execution Summary:</h5>
+                        <ul>
+                            <li>✅ <strong>Status:</strong> ${executionData.status || 'Program executed successfully'}</li>
+                            <li>✅ <strong>Variables:</strong> ${Object.keys(executionData.variables || {}).length} variables defined</li>
+                            <li>✅ <strong>Output Lines:</strong> ${(executionData.output_lines || []).length} lines printed</li>
+                            <li>✅ <strong>Exit Code:</strong> ${executionData.exit_code || 0}</li>
+                        </ul>
+                    </div>
+                `;
+
+                executionHTML += `
+                        </div>
+                        <div class="execution-success">
+                            ✅ Program executed successfully - ${(executionData.output_lines || []).length} lines of output generated
+                        </div>
+                    </div>
+                `;
+
+                // Replace content with real execution data
+                executionPhase.innerHTML = executionHTML;
+            }
+        }
+
+        function stepThrough() {
+            const code = document.querySelector('.code-editor').value;
+            if (!code.trim()) {
+                showAlert('⚠️ No Code Found', 'Please enter some code in the editor first before using step-through mode!', 'warning');
+                return;
+            }
+
+            showAlert('👣 Step-Through Mode', 'Step-through mode activated! The compiler will automatically navigate through each phase. Watch each tab as it processes your code step by step.', 'info');
+
+            // Auto-navigate through phases
+            const phases = ['lexer', 'parsetree', 'ast', 'semantic', 'ir', 'codegen', 'output'];
+            let currentPhase = 0;
+
+            const interval = setInterval(() => {
+                if (currentPhase >= phases.length) {
+                    clearInterval(interval);
+                    showAlert('✅ Step-Through Complete!', 'All compilation phases completed successfully!\n\n📊 Final Output: 30\n\nYour code has been processed through all phases of compilation and executed successfully.', 'success');
+                    return;
+                }
+
+                showPhase(phases[currentPhase]);
+                updatePhaseData(phases[currentPhase]);
+                currentPhase++;
+            }, 2000);
+        }
+
+        // Examples functionality
+        let examplesCatalog = null;
+        let currentCategory = 'all';
+
+        async function loadExamplesCatalog() {
+            try {
+                const apiUrl = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+                const response = await fetch(`${apiUrl}/api/examples`);
+                examplesCatalog = await response.json();
+                return examplesCatalog;
+            } catch (error) {
+                console.error('Failed to load examples catalog:', error);
+                return null;
+            }
+        }
+
+        async function showExamples() {
+            const panel = document.getElementById('examplesPanel');
+
+            if (!examplesCatalog) {
+                examplesCatalog = await loadExamplesCatalog();
+            }
+
+            if (examplesCatalog) {
+                renderExamplesCategories();
+                renderExamplesList();
+                panel.style.display = 'block';
+            } else {
+                alert('Failed to load examples. Please try again.');
+            }
+        }
+
+        function hideExamples() {
+            document.getElementById('examplesPanel').style.display = 'none';
+        }
+
+        function renderExamplesCategories() {
+            const container = document.getElementById('examplesCategories');
+            container.innerHTML = '';
+
+            // Add "All" category
+            const allBtn = document.createElement('button');
+            allBtn.className = `category-btn ${currentCategory === 'all' ? 'active' : ''}`;
+            allBtn.textContent = '📚 All';
+            allBtn.onclick = () => filterByCategory('all');
+            container.appendChild(allBtn);
+
+            // Add other categories
+            examplesCatalog.categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = `category-btn ${currentCategory === category.name ? 'active' : ''}`;
+                btn.textContent = category.name;
+                btn.onclick = () => filterByCategory(category.name);
+                container.appendChild(btn);
+            });
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            renderExamplesCategories();
+            renderExamplesList();
+        }
+
+        function renderExamplesList() {
+            const container = document.getElementById('examplesList');
+            container.innerHTML = '';
+
+            const filteredExamples = currentCategory === 'all'
+                ? examplesCatalog.examples
+                : examplesCatalog.examples.filter(ex => ex.category === currentCategory);
+
+            filteredExamples.forEach(example => {
+                const item = document.createElement('div');
+                item.className = 'example-item';
+                item.onclick = () => loadSpecificExample(example.id);
+
+                item.innerHTML = `
+                    <div class="example-title">${example.title}</div>
+                    <div class="example-description">${example.description}</div>
+                    <div class="example-meta">
+                        <span class="example-difficulty">📊 ${example.difficulty}</span>
+                        <span class="example-concepts">🏷️ ${example.concepts.slice(0, 3).join(', ')}</span>
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        async function loadSpecificExample(exampleId) {
+            try {
+                const apiUrl = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+                const response = await fetch(`${apiUrl}/api/examples/${exampleId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.querySelector('.code-editor').value = data.code;
+                    hideExamples();
+
+                    // Show a brief notification
+                    showNotification(`📚 Loaded: ${data.example.title}`, 'success');
+                } else {
+                    alert('Failed to load example code.');
+                }
+            } catch (error) {
+                console.error('Failed to load example:', error);
+                alert('Failed to load example. Please try again.');
+            }
+        }
+
+        // Legacy function for backward compatibility
+        function loadExample() {
+            showExamples();
+        }
+
+        function clearCode() {
+            document.querySelector('.code-editor').value = '';
+            // Reset phase indicators
+            resetPhaseIndicators();
+            showNotification('Code cleared', 'info');
+        }
+
+        function resetPhaseIndicators() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.style.background = '';
+                // Remove all checkmarks
+                tab.innerHTML = tab.innerHTML.replace(/ ✅/g, '');
+            });
+        }
+
+        function showAlert(title, message, type) {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+
+            // Create modal content
+            const modal = document.createElement('div');
+            modal.className = `modal-content ${type}`;
+
+            const iconMap = {
+                'success': '✅',
+                'warning': '⚠️',
+                'error': '❌',
+                'info': 'ℹ️'
+            };
+
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <span class="modal-icon">${iconMap[type] || 'ℹ️'}</span>
+                    <h3>${title}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>${message.replace(/\n/g, '<br>')}</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn" onclick="closeModal()">OK</button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Add click outside to close
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+        }
+
+        function closeModal() {
+            const overlay = document.querySelector('.modal-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: all 0.3s ease;
+                max-width: 300px;
+            `;
+
+            switch(type) {
+                case 'success':
+                    notification.style.background = 'linear-gradient(145deg, #38a169 0%, #2f855a 100%)';
+                    break;
+                case 'error':
+                    notification.style.background = 'linear-gradient(145deg, #e53e3e 0%, #c53030 100%)';
+                    break;
+                case 'info':
+                    notification.style.background = 'linear-gradient(145deg, #4299e1 0%, #3182ce 100%)';
+                    break;
+            }
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                compileCode();
+            }
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                loadExample();
+            }
+        });
+
+        // Add syntax highlighting simulation
+        document.querySelector('.code-editor').addEventListener('input', function() {
+            // This would integrate with a real syntax highlighter
+            // For now, just show that the editor is responsive
+        });
+    </script>
+</body>
+</html>
+

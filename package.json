@@ -1,0 +1,32 @@
+{
+  "name": "codewizard",
+  "version": "1.0.0",
+  "description": "🧙‍♂️ CodeWizard - Master the Magic of Compilation. An educational compiler with interactive web interface.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "install-deps": "npm install && cd backend && npm install",
+    "build": "cd src && make",
+    "dev": "cd backend && npm run dev"
+  },
+  "keywords": [
+    "compiler",
+    "education",
+    "lexer",
+    "parser",
+    "codegen",
+    "interactive",
+    "learning",
+    "assembly",
+    "c-compiler"
+  ],
+  "author": "CodeWizard Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aayush992/CodeWizard.git"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

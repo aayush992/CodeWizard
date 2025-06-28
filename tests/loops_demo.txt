@@ -1,0 +1,57 @@
+// 🔄 Loops and Iteration Demo
+// Master different types of loops and their applications
+
+int main() {
+    print "=== Loops Demo ===";
+    
+    // While loop - countdown
+    print "Countdown with while loop:";
+    int countdown = 5;
+    while (countdown > 0) {
+        print countdown;
+        countdown = countdown - 1;
+    }
+    print "Blast off!";
+    print "";
+    
+    // For loop - counting up
+    print "Counting up with for loop:";
+    int i;
+    for (i = 1; i <= 5; i = i + 1) {
+        print i;
+    }
+    print "";
+    
+    // Nested loops - multiplication table
+    print "Multiplication table (3x3):";
+    int row;
+    int col;
+    for (row = 1; row <= 3; row = row + 1) {
+        for (col = 1; col <= 3; col = col + 1) {
+            int result = row * col;
+            print result;
+        }
+        print "---";
+    }
+    
+    // Sum calculation
+    print "Sum of numbers 1 to 10:";
+    int sum = 0;
+    int num = 1;
+    while (num <= 10) {
+        sum = sum + num;
+        num = num + 1;
+    }
+    print sum;
+    
+    // Factorial calculation
+    print "Factorial of 5:";
+    int factorial = 1;
+    int n = 5;
+    for (i = 1; i <= n; i = i + 1) {
+        factorial = factorial * i;
+    }
+    print factorial;
+    
+    return 0;
+}
